@@ -1,5 +1,5 @@
 <?php
-// Aktifkan pelaporan error agar terlihat di layar
+// Aktifkan pelaporan error
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
@@ -9,16 +9,17 @@ $pass = getenv('MYSQLPASSWORD') ?: '';
 $db   = getenv('MYSQLDATABASE') ?: 'railway';
 $port = getenv('MYSQLPORT') ?: '3306';
 
-// Cek apakah ekstensi mysqli aktif
-if (!function_exists('mysqli_connect')) {
-    die("KRITIS: Ekstensi MySQLi belum aktif di server PHP ini!");
+try {
+    // Membuat koneksi menggunakan PDO (Natif aktif di semua server PHP)
+    $dsn = "mysql:host=$host;port=$port;dbname=$db;charset=utf8mb4";
+    $conn = new PDO($dsn, $user, $pass, [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+    ]);
+    
+    // Jika berhasil terkoneksi
+    // echo "Koneksi database berhasil menggunakan PDO!";
+} catch (PDOException $e) {
+    die("Koneksi Database Gagal: " . $e->getMessage());
 }
-
-$conn = mysqli_connect($host, $user, $pass, $db, (int)$port);
-
-if (!$conn) {
-    die("Koneksi Database Gagal: " . mysqli_connect_error());
-}
-// Jika berhasil, tampilkan pesan sukses sementara
-echo "Koneksi database berhasil terhubung ke server!";
 ?>
